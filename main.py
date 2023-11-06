@@ -27,7 +27,7 @@ def leArquivo(arquivo):
 
     return virtual, fisica, quantidade, vetor
 
-def otimo(arquivo,botao = 0):
+def otimo(arquivo,botao):
     _, fisica, quantidade, vetor = leArquivo(arquivo)
 
     memoriaFisica = [-1] * fisica
@@ -214,12 +214,10 @@ def NRU(arquivo,botao): # não usada recentemente
             time.sleep(1)
 
 def atualizar_resultados(quantidade, quantidade_substituicoes_algo):
+    global quantidadeSubstituicoesOtimo 
     gap = (quantidade - quantidade_substituicoes_algo) / (quantidade - quantidadeSubstituicoesOtimo) * 100
     resultado_label.config(text=f"Quantidade de páginas substituídas: {quantidade_substituicoes_algo}\nGAP para o algoritmo ótimo: {gap:.2f}%")
     root.update_idletasks()
-
-def prox_passo():
-    passo = 1
 
 # Função para executar o algoritmo escolhido
 def executar_algoritmo(botao):
@@ -229,10 +227,10 @@ def executar_algoritmo(botao):
 
     _, _, quantidade, _ = leArquivo(arquivo)
     if quantidadeSubstituicoesOtimo == 0:
-        quantidadeSubstituicoesOtimo = otimo(arquivo)
+        quantidadeSubstituicoesOtimo = otimo(arquivo,0)
 
     if algoritmo == "Ótimo":
-        quantidadeSubstituicoesOtimo
+        otimo(arquivo,botao)
     elif algoritmo == "Aleatório":
         aleatorio(arquivo,botao)
     elif algoritmo == "FIFO":
