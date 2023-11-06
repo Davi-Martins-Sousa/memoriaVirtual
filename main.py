@@ -280,8 +280,8 @@ algoritmo_combobox = ttk.Combobox(root, values=["Ótimo", "Aleatório", "FIFO", 
 algoritmo_combobox.pack()
 
 # Botão para simular passo-a-passo,
-executar_1_button = tk.Button(root, text="Executar 1", command=lambda: executar_algoritmo(1))
-executar_1_button.pack()
+#executar_1_button = tk.Button(root, text="Executar 1", command=lambda: executar_algoritmo(1))
+#executar_1_button.pack()
 
 # Botão para simular em tempo real
 executar_2_button = tk.Button(root, text="Executar 2", command=lambda: executar_algoritmo(2))
