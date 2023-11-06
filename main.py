@@ -1,14 +1,21 @@
 import pandas as pd
 import random
+import tkinter as tk
+import time
+from tkinter import ttk
+from tkinter import messagebox
+
+quantidadeSubstituicoesOtimo = 0
+passo = 0
 
 
-def leArquivo():
+def leArquivo(arquivo):
 
     # Lista para armazenar as linhas do arquivo
     linhas = []
 
     # Abre o arquivo em modo binário e lê as linhas
-    with open('dados/teste1.txt', 'rb') as arquivo:
+    with open('dados/{}'.format(arquivo), 'rb') as arquivo:
         for linha in arquivo:
             linhas.append(linha.decode('utf-8', errors='ignore'))
 
@@ -20,8 +27,8 @@ def leArquivo():
 
     return virtual, fisica, quantidade, vetor
 
-def otimo():
-    virtual, fisica, quantidade, vetor = leArquivo()
+def otimo(arquivo,botao = 0):
+    _, fisica, quantidade, vetor = leArquivo(arquivo)
 
     memoriaFisica = [-1] * fisica
     quantidadeDeSubstituicoes = 0
@@ -50,11 +57,17 @@ def otimo():
                         break
                 memoriaFisica[paginaSubstituida] = vetor[indice]
 
-    #print(quantidadeDeSubstituicoes)
-    return quantidadeDeSubstituicoes
+        if botao != 0:
+            atualizar_resultados(quantidade,quantidadeDeSubstituicoes)
+        if botao == 2:
+            time.sleep(1)
+        
+    if botao == 0:
+        return quantidadeDeSubstituicoes
 
-def aleatorio():
-    virtual, fisica, quantidade, vetor = leArquivo()
+def aleatorio(arquivo,botao):
+    global passo
+    _, fisica, quantidade, vetor = leArquivo(arquivo)
 
     memoriaFisica = [-1] * fisica
     quantidadeDeSubstituicoes = 0
@@ -65,12 +78,15 @@ def aleatorio():
         else:
             quantidadeDeSubstituicoes += 1
             memoriaFisica[ random.randint(0, fisica-1)] = vetor[indice]
+        atualizar_resultados(quantidade,quantidadeDeSubstituicoes)
 
-    #print(quantidadeDeSubstituicoes)
-    return quantidadeDeSubstituicoes
+        if botao == 2:
+            time.sleep(1)
+        
+       
 
-def fifo():
-    virtual, fisica, quantidade, vetor = leArquivo()
+def fifo(arquivo,botao):
+    _, fisica, quantidade, vetor = leArquivo(arquivo)
 
     memoriaFisica = [-1] * fisica
     inciceDeSubstituicao = 0
@@ -87,11 +103,13 @@ def fifo():
             if inciceDeSubstituicao == fisica:
                 inciceDeSubstituicao = 0
 
-    #print(quantidadeDeSubstituicoes)
-    return quantidadeDeSubstituicoes
+        atualizar_resultados(quantidade,quantidadeDeSubstituicoes)
 
-def segndaChance():
-    virtual, fisica, quantidade, vetor = leArquivo()
+        if botao == 2:
+            time.sleep(1)
+
+def segndaChance(arquivo,botao):
+    _, fisica, quantidade, vetor = leArquivo(arquivo)
 
     memoriaFisica = [-1] * fisica
     controle = [0] * fisica
@@ -115,12 +133,14 @@ def segndaChance():
             inciceDeSubstituicao += 1
             if inciceDeSubstituicao == fisica:
                 inciceDeSubstituicao = 0
+        
+        atualizar_resultados(quantidade,quantidadeDeSubstituicoes)
 
-    #print(quantidadeDeSubstituicoes)
-    return quantidadeDeSubstituicoes
+        if botao == 2:
+            time.sleep(1)
 
-def lru(): # menos recentemente usada
-    virtual, fisica, quantidade, vetor = leArquivo()
+def lru(arquivo,botao):# menos recentemente usada
+    _, fisica, quantidade, vetor = leArquivo(arquivo)
 
     memoriaFisica = [-1] * fisica
     controle = [-1] * fisica
@@ -136,11 +156,13 @@ def lru(): # menos recentemente usada
             memoriaFisica[inciceDeSubstituicao] = vetor[indice]
             controle[inciceDeSubstituicao] = indice
 
-    #print(quantidadeDeSubstituicoes)
-    return quantidadeDeSubstituicoes
+        atualizar_resultados(quantidade,quantidadeDeSubstituicoes)
 
-def NRU(): # não usada recentemente
-    virtual, fisica, quantidade, vetor = leArquivo()
+        if botao == 2:
+            time.sleep(1)
+
+def NRU(arquivo,botao): # não usada recentemente
+    _, fisica, quantidade, vetor = leArquivo(arquivo)
 
     memoriaFisica = [-1] * fisica
     bits_referencia = [0] * fisica
@@ -149,12 +171,10 @@ def NRU(): # não usada recentemente
 
     for indice in range(len(vetor)):
         if vetor[indice] in memoriaFisica:
-            # Defina o bit de referência para 1 para a página presente
             bits_referencia[memoriaFisica.index(vetor[indice])] = 1
         else:
             quantidadeDeSubstituicoes += 1
 
-            # Verifique se alguma página deve ser removida
             page_to_replace = None
             i = 0
             while page_to_replace is None and i < fisica:
@@ -188,42 +208,93 @@ def NRU(): # não usada recentemente
                 bits_referencia[page_to_replace] = 0
                 bits_modificacao[page_to_replace] = 0
 
-    #print(quantidadeDeSubstituicoes)
-    return quantidadeDeSubstituicoes
+        atualizar_resultados(quantidade,quantidadeDeSubstituicoes)
 
-NRU()
+        if botao == 2:
+            time.sleep(1)
 
-_, _, quantidade, _ = leArquivo()
-quantidadeSubstituicoesOtimo = otimo()
-quantidadeSubstituicoesAleatorio = aleatorio()
-quantidadeSubstituicoesFifo = fifo()
-quantidadeSubstituicoesSegundaChance = segndaChance()
-quantidadeSubstituicoesLRU = lru()
-quantidadeSubstituicoesNRU = NRU()
+def atualizar_resultados(quantidade, quantidade_substituicoes_algo):
+    gap = (quantidade - quantidade_substituicoes_algo) / (quantidade - quantidadeSubstituicoesOtimo) * 100
+    resultado_label.config(text=f"Quantidade de páginas substituídas: {quantidade_substituicoes_algo}\nGAP para o algoritmo ótimo: {gap:.2f}%")
+    root.update_idletasks()
 
-print('\nAlgoritmo ótimo')
-print('Quantidade de páginas substituídas: ',quantidadeSubstituicoesOtimo)
-print('GAP para o algoritmo ótimo: ', (quantidade-quantidadeSubstituicoesOtimo)/(quantidade-quantidadeSubstituicoesOtimo)*100,'%')
+def prox_passo():
+    passo = 1
 
-print('\nAlgoritmo aleatório')
-print('Quantidade de páginas substituídas: ',quantidadeSubstituicoesAleatorio)
-print('GAP para o algoritmo ótimo: ', (quantidade- quantidadeSubstituicoesAleatorio)/(quantidade-quantidadeSubstituicoesOtimo)*100,'%')
+# Função para executar o algoritmo escolhido
+def executar_algoritmo(botao):
+    global quantidadeSubstituicoesOtimo 
+    arquivo = arquivo_entry.get()
+    algoritmo = algoritmo_combobox.get()
 
-print('\nAlgoritmo FIFO')
-print('Quantidade de páginas substituídas: ',quantidadeSubstituicoesFifo)
-print('GAP para o algoritmo ótimo: ', (quantidade- quantidadeSubstituicoesFifo)/(quantidade-quantidadeSubstituicoesOtimo)*100,'%')
+    _, _, quantidade, _ = leArquivo(arquivo)
+    if quantidadeSubstituicoesOtimo == 0:
+        quantidadeSubstituicoesOtimo = otimo(arquivo)
 
+    if algoritmo == "Ótimo":
+        quantidadeSubstituicoesOtimo
+    elif algoritmo == "Aleatório":
+        aleatorio(arquivo,botao)
+    elif algoritmo == "FIFO":
+        fifo(arquivo,botao)
+    elif algoritmo == "Segunda Chance":
+        segndaChance(arquivo,botao)
+    elif algoritmo == "LRU":
+        lru(arquivo,botao)
+    elif algoritmo == "NRU":
+        NRU(arquivo,botao)
+    else:
+        messagebox.showerror("Erro", "Algoritmo não reconhecido")
+        return
 
-print('\nAlgoritmo segunda chance')
-print('Quantidade de páginas substituídas: ',quantidadeSubstituicoesSegundaChance)
-print('GAP para o algoritmo ótimo: ', (quantidade- quantidadeSubstituicoesSegundaChance)/(quantidade-quantidadeSubstituicoesOtimo)*100,'%')
+    #gap = (quantidade - quantidade_substituicoes) / (quantidade - quantidadeSubstituicoesOtimo) * 100
 
+    #resultado_label.config(text=f"Quantidade de páginas substituídas: {quantidade_substituicoes}\nGAP para o algoritmo ótimo: {gap:.2f}%")
 
-print('\nAlgoritmo LRU')
-print('Quantidade de páginas substituídas: ',quantidadeSubstituicoesLRU)
-print('GAP para o algoritmo ótimo: ', (quantidade- quantidadeSubstituicoesLRU)/(quantidade-quantidadeSubstituicoesOtimo)*100,'%')
+# Configuração da janela principal
+root = tk.Tk()
+root.title("Simulação de Algoritmos de Substituição de Páginas")
+root.geometry("400x300")  # Define o tamanho inicial da janela
 
+# Estilo para os widgets
+style = ttk.Style()
+style.configure('TLabel', font=('Arial', 12))
+style.configure('TButton', font=('Arial', 12))
+style.configure('TEntry', font=('Arial', 12))
+style.configure('TCombobox', font=('Arial', 12))
 
-print('\nAlgoritmo NRU')
-print('Quantidade de páginas substituídas: ',quantidadeSubstituicoesNRU)
-print('GAP para o algoritmo ótimo: ', (quantidade- quantidadeSubstituicoesNRU)/(quantidade-quantidadeSubstituicoesOtimo)*100,'%')
+# Cor de fundo da janela
+root.configure(bg='#f0f0f0')
+
+# Cor de fundo dos widgets
+widget_bg_color = '#e0e0e0'
+
+# Entrada para o nome do arquivo
+arquivo_label = tk.Label(root, text="Nome do arquivo:")
+arquivo_label.pack()
+arquivo_entry = tk.Entry(root)
+arquivo_entry.pack()
+
+# Combobox para escolher o algoritmo
+algoritmo_label = tk.Label(root, text="Escolha o algoritmo:")
+algoritmo_label.pack()
+algoritmo_combobox = ttk.Combobox(root, values=["Ótimo", "Aleatório", "FIFO", "Segunda Chance", "LRU", "NRU"])
+algoritmo_combobox.pack()
+
+# Botão para simular passo-a-passo,
+executar_1_button = tk.Button(root, text="Executar 1", command=lambda: executar_algoritmo(1))
+executar_1_button.pack()
+
+# Botão para simular em tempo real
+executar_2_button = tk.Button(root, text="Executar 2", command=lambda: executar_algoritmo(2))
+executar_2_button.pack()
+
+# Botão para simulação completa,
+executar_3_button = tk.Button(root, text="Executar 3", command=lambda: executar_algoritmo(3))
+executar_3_button.pack()
+
+# Label para exibir o resultado
+resultado_label = tk.Label(root, text="")
+resultado_label.pack()
+
+root.mainloop()
