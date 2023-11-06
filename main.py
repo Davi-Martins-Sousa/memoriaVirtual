@@ -81,9 +81,7 @@ def aleatorio(arquivo,botao):
         atualizar_resultados(quantidade,quantidadeDeSubstituicoes)
 
         if botao == 2:
-            time.sleep(1)
-        
-       
+            time.sleep(1)      
 
 def fifo(arquivo,botao):
     _, fisica, quantidade, vetor = leArquivo(arquivo)
@@ -225,7 +223,6 @@ def executar_algoritmo(botao):
     arquivo = arquivo_entry.get()
     algoritmo = algoritmo_combobox.get()
 
-    _, _, quantidade, _ = leArquivo(arquivo)
     if quantidadeSubstituicoesOtimo == 0:
         quantidadeSubstituicoesOtimo = otimo(arquivo,0)
 
@@ -244,10 +241,6 @@ def executar_algoritmo(botao):
     else:
         messagebox.showerror("Erro", "Algoritmo não reconhecido")
         return
-
-    #gap = (quantidade - quantidade_substituicoes) / (quantidade - quantidadeSubstituicoesOtimo) * 100
-
-    #resultado_label.config(text=f"Quantidade de páginas substituídas: {quantidade_substituicoes}\nGAP para o algoritmo ótimo: {gap:.2f}%")
 
 # Configuração da janela principal
 root = tk.Tk()
